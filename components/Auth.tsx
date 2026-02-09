@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Wallet, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -53,7 +54,7 @@ const Auth: React.FC = () => {
           <div className="inline-flex items-center justify-center p-4 bg-indigo-600 rounded-2xl shadow-xl mb-6 transform -rotate-6">
             <Wallet className="text-white w-10 h-10" />
           </div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight">SmartSpend</h1>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">Controla tu Gasto</h1>
           <p className="text-gray-500 mt-2 font-medium">Gestiona tus gastos con inteligencia</p>
         </div>
 

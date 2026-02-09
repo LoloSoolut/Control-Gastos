@@ -7,7 +7,6 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend 
 } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react';
-import AiInsights from './AiInsights';
 
 interface DashboardProps {
   user: User;
@@ -206,8 +205,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
         </div>
       </div>
-
-      <AiInsights expenses={currentMonthExpenses} total={totalCurrent} />
     </div>
   );
 };

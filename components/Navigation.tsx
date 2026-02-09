@@ -29,7 +29,7 @@ const Navigation: React.FC<NavigationProps> = ({ user }) => {
         <div className="bg-indigo-600 p-2 rounded-lg">
           <Wallet className="text-white w-6 h-6" />
         </div>
-        <span className="text-xl font-bold text-gray-900 tracking-tight">SmartSpend</span>
+        <span className="text-xl font-bold text-gray-900 tracking-tight">Controla tu Gasto</span>
       </div>
 
       <div className="flex-1 px-4 space-y-1 mt-4">
