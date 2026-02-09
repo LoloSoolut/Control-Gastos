@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Expense } from '../types';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '../constants';
-import { Trash2, Search, Filter } from 'lucide-react';
+import { Trash2, Search } from 'lucide-react';
 
 interface ExpenseListProps {
   user: User;
@@ -31,10 +30,12 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
   };
 
   const deleteExpense = async (id: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este gasto?')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este gasto de forma permanente?')) return;
     const { error } = await supabase.from('expenses').delete().eq('id', id);
     if (!error) {
       setExpenses(expenses.filter(e => e.id !== id));
+    } else {
+      alert('Error al eliminar: ' + error.message);
     }
   };
 
@@ -52,7 +53,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
           <input
             type="text"
             placeholder="Buscar por descripción o categoría..."
-            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -68,7 +69,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
                 <th className="px-6 py-4">Descripción</th>
                 <th className="px-6 py-4">Categoría</th>
                 <th className="px-6 py-4">Cantidad</th>
-                <th className="px-6 py-4 text-right">Acciones</th>
+                <th className="px-6 py-4 text-right">Acción</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -78,12 +79,12 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
                 </tr>
               ) : filteredExpenses.length > 0 ? (
                 filteredExpenses.map((expense) => (
-                  <tr key={expense.id} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {new Date(expense.date).toLocaleDateString('es-ES')}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {expense.description || 'Sin descripción'}
+                      {expense.description || 'Gasto registrado'}
                     </td>
                     <td className="px-6 py-4">
                       <span 
@@ -99,8 +100,8 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => deleteExpense(expense.id)}
-                        title="Eliminar gasto"
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-40 group-hover:opacity-100"
+                        className="p-2 text-red-400 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all"
+                        title="Borrar gasto"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -109,7 +110,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ user }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-gray-400 italic">No se han encontrado gastos</td>
+                  <td colSpan={5} className="px-6 py-10 text-center text-gray-400 italic">No se han encontrado registros</td>
                 </tr>
               )}
             </tbody>

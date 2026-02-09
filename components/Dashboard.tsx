@@ -38,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     fetchExpenses();
   }, [user.id]);
 
-  // Filtrado de datos del mes seleccionado
+  // Filtrado de datos del mes seleccionado (Del día 1 al último día del mes)
   const currentMonthExpenses = expenses.filter(e => {
     const d = new Date(e.date);
     return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
@@ -95,14 +95,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Resumen Financiero</h1>
-          <p className="text-gray-500 mt-1">Hola. Aquí tienes tus estadísticas de {MONTHS_ES[selectedMonth]} {selectedYear}.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Resumen Mensual Global</h1>
+          <p className="text-gray-500 mt-1">Gestión de gastos de {MONTHS_ES[selectedMonth]} {selectedYear}.</p>
         </div>
         <div className="flex gap-2">
           <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
           >
             {MONTHS_ES.map((m, idx) => (
               <option key={`month-${idx}`} value={idx}>{m}</option>
@@ -111,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <select 
             value={selectedYear} 
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
           >
             {[2024, 2025].map(y => (
               <option key={`year-${y}`} value={y}>{y}</option>
@@ -126,7 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <DollarSign size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Gasto Total Mes</p>
+            <p className="text-sm font-medium text-gray-500">Total del Mes</p>
             <p className="text-2xl font-bold text-gray-900">{totalCurrent.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</p>
           </div>
         </div>
@@ -148,7 +148,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <Calendar size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Transacciones</p>
+            <p className="text-sm font-medium text-gray-500">Total Transacciones</p>
             <p className="text-2xl font-bold text-gray-900">{currentMonthExpenses.length}</p>
           </div>
         </div>
@@ -156,7 +156,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribución por Categoría</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribución de Gastos</h3>
           <div className="h-64">
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -182,13 +182,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-400 italic">No hay datos para este periodo</div>
+              <div className="h-full flex items-center justify-center text-gray-400 italic">No hay gastos registrados este mes</div>
             )}
           </div>
         </div>
 
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Histórico Últimos 6 Meses</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Comparativa Mensual</h3>
           <div className="h-64">
              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData}>
