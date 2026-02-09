@@ -7,7 +7,8 @@ import Navigation from './components/Navigation';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
 import { User } from './types';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+// Fix: Use namespace import for react-router-dom to handle environment resolution issues
+import * as Router from 'react-router-dom';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -47,19 +48,19 @@ const App: React.FC = () => {
   }
 
   return (
-    <HashRouter>
+    <Router.HashRouter>
       <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
         <Navigation user={user} />
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard user={user} />} />
-            <Route path="/add" element={<ExpenseForm user={user} />} />
-            <Route path="/history" element={<ExpenseList user={user} />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+          <Router.Routes>
+            <Router.Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Router.Route path="/add" element={<ExpenseForm user={user} />} />
+            <Router.Route path="/history" element={<ExpenseList user={user} />} />
+            <Router.Route path="*" element={<Router.Navigate to="/dashboard" replace />} />
+          </Router.Routes>
         </main>
       </div>
-    </HashRouter>
+    </Router.HashRouter>
   );
 };
 

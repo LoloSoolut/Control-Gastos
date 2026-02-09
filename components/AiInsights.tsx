@@ -18,7 +18,8 @@ const AiInsights: React.FC<AiInsightsProps> = ({ expenses, total }) => {
     setLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      // Fix: Always use process.env.API_KEY directly as per guidelines.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const summary = expenses.reduce((acc, curr) => {
         acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -35,10 +36,12 @@ const AiInsights: React.FC<AiInsightsProps> = ({ expenses, total }) => {
         contents: prompt,
       });
 
+      // Fix: Access .text property directly, do not use text().
       setInsight(response.text || 'No se pudo generar el consejo en este momento.');
     } catch (error) {
       console.error('Error generating AI insights:', error);
-      setInsight('Configura tu API_KEY para recibir consejos inteligentes de ahorro.');
+      // Fix: Do not prompt the user to update their API key in the UI.
+      setInsight('Ocurrió un error al analizar tus gastos. Por favor, inténtalo de nuevo más tarde.');
     } finally {
       setLoading(false);
     }

@@ -2,11 +2,11 @@
 import { Category } from './types';
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  [Category.FACTURAS]: '#3b82f6', // Blue
+  [Category.FACTURAS]: '#ef4444', // Red
   [Category.HIPOTECA]: '#6366f1', // Indigo
-  [Category.COMIDA]: '#10b981',   // Green
-  [Category.OCIO]: '#f59e0b',     // Amber
-  [Category.EXTRAS]: '#ef4444',   // Red
+  [Category.COMIDA]: '#3b82f6',   // Blue
+  [Category.OCIO]: '#10b981',     // Green
+  [Category.EXTRAS]: '#f59e0b',   // Amber
 };
 
 export const CATEGORY_LABELS: Record<Category, string> = {

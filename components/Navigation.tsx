@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// Fix: Use namespace import for react-router-dom
+import * as Router from 'react-router-dom';
 import { LayoutDashboard, PlusCircle, History, LogOut, Wallet } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { User } from '../types';
@@ -10,7 +11,7 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ user }) => {
-  const location = useLocation();
+  const location = Router.useLocation();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -33,7 +34,7 @@ const Navigation: React.FC<NavigationProps> = ({ user }) => {
 
       <div className="flex-1 px-4 space-y-1 mt-4">
         {navItems.map((item) => (
-          <Link
+          <Router.Link
             key={item.path}
             to={item.path}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
@@ -44,7 +45,7 @@ const Navigation: React.FC<NavigationProps> = ({ user }) => {
           >
             <item.icon size={20} />
             {item.label}
-          </Link>
+          </Router.Link>
         ))}
       </div>
 
