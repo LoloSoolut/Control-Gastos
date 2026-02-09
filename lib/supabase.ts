@@ -1,15 +1,18 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-// Note: These would normally be in process.env
-// For this generation, we provide the logic to connect.
-// Users need to set their actual credentials in their Supabase dashboard.
-const supabaseUrl = (window as any)._env_?.SUPABASE_URL || 'https://your-project-url.supabase.co';
-const supabaseAnonKey = (window as any)._env_?.SUPABASE_ANON_KEY || 'your-anon-key';
+// Valores por defecto para evitar errores de sintaxis si no se proporcionan variables
+const DEFAULT_URL = 'https://placeholder.supabase.co';
+const DEFAULT_KEY = 'placeholder-key';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = (window as any)._env_?.SUPABASE_URL || DEFAULT_URL;
+const supabaseAnonKey = (window as any)._env_?.SUPABASE_ANON_KEY || DEFAULT_KEY;
 
-// Helper for initial schema check or mock data logic
+// Inicialización segura del cliente
+export const supabase = createClient(
+  supabaseUrl === 'tu-url-de-supabase' ? DEFAULT_URL : supabaseUrl, 
+  supabaseAnonKey === 'tu-anon-key-de-supabase' ? DEFAULT_KEY : supabaseAnonKey
+);
+
 export const isSupabaseConfigured = () => {
-    return supabaseUrl !== 'https://your-project-url.supabase.co';
+    return supabaseUrl !== DEFAULT_URL && !supabaseUrl.includes('tu-url-de-supabase');
 };

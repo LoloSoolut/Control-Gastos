@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Expense, Category } from '../types';
@@ -20,10 +19,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [user.id]);
-
   const fetchExpenses = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -40,7 +35,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     setLoading(false);
   };
 
-  // Filter current month data
+  useEffect(() => {
+    fetchExpenses();
+  }, [user.id]);
+
+  // Filtrado de datos del mes seleccionado
   const currentMonthExpenses = expenses.filter(e => {
     const d = new Date(e.date);
     return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
@@ -48,14 +47,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const totalCurrent = currentMonthExpenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-  // Group by category for Pie Chart
+  // Datos para el gráfico de pastel
   const pieData = Object.values(Category).map(cat => ({
     name: CATEGORY_LABELS[cat],
-    value: currentMonthExpenses.filter(e => e.category === cat).reduce((acc, curr) => acc + curr.amount, 0),
+    value: currentMonthExpenses
+      .filter(e => e.category === cat)
+      .reduce((acc, curr) => acc + curr.amount, 0),
     color: CATEGORY_COLORS[cat]
   })).filter(item => item.value > 0);
 
-  // Comparison logic
+  // Lógica de comparación con mes anterior
   const prevMonth = selectedMonth === 0 ? 11 : selectedMonth - 1;
   const prevYear = selectedMonth === 0 ? selectedYear - 1 : selectedYear;
   const prevMonthExpenses = expenses.filter(e => {
@@ -66,7 +67,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const diff = totalCurrent - totalPrev;
   const percentageDiff = totalPrev === 0 ? 0 : ((diff / totalPrev) * 100).toFixed(1);
 
-  // Last 6 months for Bar Chart
+  // Datos para el gráfico de barras (últimos 6 meses)
   const barData = Array.from({ length: 6 }).map((_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
@@ -85,23 +86,27 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     };
   });
 
-  if (loading) return <div className="flex justify-center py-10">Cargando datos...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center py-20">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+    </div>
+  );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Resumen Financiero</h1>
-          <p className="text-gray-500 mt-1">Hola de nuevo. Aquí tienes tus estadísticas de {MONTHS_ES[selectedMonth]}.</p>
+          <p className="text-gray-500 mt-1">Hola. Aquí tienes tus estadísticas de {MONTHS_ES[selectedMonth]} {selectedYear}.</p>
         </div>
         <div className="flex gap-2">
-           <select 
+          <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
             className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
           >
             {MONTHS_ES.map((m, idx) => (
-              <option key={m} value={idx}>{m}</option>
+              <option key={`month-${idx}`} value={idx}>{m}</option>
             ))}
           </select>
           <select 
@@ -109,14 +114,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
             className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
           >
-            {[2023, 2024, 2025].map(y => (
-              <option key={y} value={y}>{y}</option>
+            {[2024, 2025].map(y => (
+              <option key={`year-${y}`} value={y}>{y}</option>
             ))}
           </select>
         </div>
       </header>
 
-      {/* Top Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600">
@@ -151,9 +155,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       </div>
 
-      {/* Main Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Pie Chart Distribution */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Distribución por Categoría</h3>
           <div className="h-64">
@@ -174,7 +176,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                     formatter={(value: number) => `${value.toFixed(2)}€`}
                   />
                   <Legend verticalAlign="bottom" height={36}/>
@@ -186,7 +188,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
         </div>
 
-        {/* Bar Chart History */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Histórico Últimos 6 Meses</h3>
           <div className="h-64">
@@ -197,7 +198,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                   <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                   <Tooltip 
                     cursor={{fill: '#f8fafc'}}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                   />
                   <Bar dataKey="total" fill="#6366f1" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -206,7 +207,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       </div>
 
-      {/* AI Insights Section */}
       <AiInsights expenses={currentMonthExpenses} total={totalCurrent} />
     </div>
   );
