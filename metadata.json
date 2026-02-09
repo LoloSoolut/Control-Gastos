@@ -1,0 +1,5 @@
+{
+  "name": "SmartSpend - Gestión de Gastos",
+  "description": "Una aplicación avanzada para gestionar gastos personales con categorización automática, resúmenes mensuales, visualización de datos y consejos impulsados por IA (Gemini).",
+  "requestFramePermissions": []
+}
