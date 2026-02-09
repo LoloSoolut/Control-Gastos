@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Wallet, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { Wallet, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,23 +9,38 @@ const Auth: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null);
+
+  const configured = isSupabaseConfigured();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!configured) {
+      setMessage({ 
+        type: 'warning', 
+        text: '⚠️ Supabase no está configurado. Debes añadir tu URL y Anon Key en lib/supabase.ts' 
+      });
+      return;
+    }
+
     setLoading(true);
     setMessage(null);
 
-    const { error } = isLogin 
-      ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password });
+    try {
+      const { error } = isLogin 
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({ email, password });
 
-    if (error) {
-      setMessage({ type: 'error', text: error.message });
-    } else if (!isLogin) {
-      setMessage({ type: 'success', text: '¡Registro con éxito! Por favor verifica tu email o inicia sesión.' });
+      if (error) {
+        setMessage({ type: 'error', text: error.message });
+      } else if (!isLogin) {
+        setMessage({ type: 'success', text: '¡Registro con éxito! Por favor verifica tu email o inicia sesión.' });
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: 'Error de conexión: ' + err.message });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -38,6 +53,15 @@ const Auth: React.FC = () => {
           <h1 className="text-4xl font-black text-gray-900 tracking-tight">SmartSpend</h1>
           <p className="text-gray-500 mt-2 font-medium">Toma el control de tu futuro financiero</p>
         </div>
+
+        {!configured && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex gap-3 text-amber-800 text-sm italic">
+            <AlertCircle className="shrink-0" size={20} />
+            <p>
+              <strong>Falta configuración:</strong> Edita <code>lib/supabase.ts</code> con tus credenciales de Supabase para poder iniciar sesión.
+            </p>
+          </div>
+        )}
 
         <div className="bg-white p-8 rounded-3xl shadow-xl shadow-indigo-100 border border-indigo-50">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -83,14 +107,18 @@ const Auth: React.FC = () => {
             </div>
 
             {message && (
-              <div className={`p-4 rounded-xl text-sm font-medium ${message.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+              <div className={`p-4 rounded-xl text-sm font-medium ${
+                message.type === 'error' ? 'bg-red-50 text-red-600' : 
+                message.type === 'warning' ? 'bg-amber-50 text-amber-600' :
+                'bg-green-50 text-green-600'
+              }`}>
                 {message.text}
               </div>
             )}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !configured}
               className="w-full flex items-center justify-center gap-2 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transform active:scale-95 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
             >
               {loading ? 'Procesando...' : isLogin ? 'Entrar' : 'Registrarme'}
